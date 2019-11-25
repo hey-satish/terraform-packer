@@ -1,0 +1,43 @@
+{
+  "variables": {
+   "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
+    "aws_secret_key": "{{env `AWC_SECRET_ACCESS_KEY`}}",
+    "aws_region": "us-east-1"
+
+},
+    "builders": [
+{
+    "access_key": "{{user `aws_access_key`}}",
+    "ami_name": "packer-linux-aws-demo-{{timestamp}}",
+    "instance_type": "t2.micro",
+    "region": "us-east-1",
+    "secret_key": "{{user `aws_secret_key`}}",
+    "source_ami_filter": {
+        "filters": {
+        "virtualization-type": "hvm",
+        "name": "amzn2-ami-hvm-2.0.20191024.3-x86_64-gp2",
+        "root-device-type": "ebs"
+        },
+        "owners": ["137112412989"],
+        "most_recent": true
+      },
+    "ssh_username": "ec2-user",
+    "type": "amazon-ebs"
+  }
+],
+"provisioners": [
+{
+"type": "file",
+"source": "/home/ec2-user/packer/image-scripts/images.sh",
+"destination": "/home/ec2-user/"
+},
+  {
+    "type": "shell",
+    "execute_command": "echo '{{user `ssh_pass`}}' | {{ .Vars }} sudo -E -S sh '{{ .Path }}'",
+    "script": "/home/ec2-user/packer/image-scripts/images.sh"
+
+  }
+]
+}
+
+
